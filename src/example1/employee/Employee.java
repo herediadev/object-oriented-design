@@ -1,4 +1,4 @@
-package employee;
+package example1.employee;
 
 /*
 Working without getters and setters

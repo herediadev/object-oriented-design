@@ -1,4 +1,4 @@
-package employee;
+package example1.employee;
 
 public class XMLExporter implements Employee.Exporter {
     private String name;
