@@ -28,6 +28,11 @@ public final class Currency implements Comparable<Currency> {
         return other instanceof Currency && this.equals((Currency) other);
     }
 
+    @Override
+    public int hashCode() {
+        return this.symbol.hashCode();
+    }
+
     private boolean equals(Currency other) {
         return this.symbol.equals(other.symbol);
     }

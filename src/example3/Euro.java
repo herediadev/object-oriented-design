@@ -15,6 +15,11 @@ public class Euro extends Money {
         return other != null && other.getClass() == this.getClass() && this.equals((Euro) other);
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode() * 31 + this.iso2Country.hashCode();
+    }
+
     private boolean equals(Euro other) {
         return super.equals(other) && this.iso2Country.equals(other.iso2Country);
     }
