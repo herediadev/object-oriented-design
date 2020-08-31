@@ -31,6 +31,15 @@ public class Money implements Comparable<Money> {
         return this.amount + " " + this.currency;
     }
 
+    @Override
+    public boolean equals(Object other) {
+        return other != null && other.getClass() == this.getClass() && this.equals((Money) other);
+    }
+
+    private boolean equals(Money other) {
+        return this.amount.equals(other.amount) && this.currency.equals(other.currency);
+    }
+
     public Money add(Money other) {
         if (other.currency.compareTo(this.currency) != 0)
             throw new IllegalArgumentException("using different currency");
