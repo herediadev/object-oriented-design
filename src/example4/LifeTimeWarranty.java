@@ -10,7 +10,7 @@ public class LifeTimeWarranty implements Warranty {
     }
 
     @Override
-    public boolean isValidOn(LocalDate date) {
-        return issuedOn.compareTo(date) <= 0;
+    public Warranty on(LocalDate date) {
+        return date.compareTo(issuedOn) < 0 ? VOID : this;
     }
 }
