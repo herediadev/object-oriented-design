@@ -1,16 +1,17 @@
 package example5;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class Article {
 
     private final Warranty moneyBackGuarantee;
     private final Warranty expressWarranty;
     private Warranty effectiveExpressWarranty;
-    private Part sensor;
+    private Optional<Part> sensor;
     private Warranty extendedWarranty;
 
-    private Article(Warranty moneyBackGuarantee, Warranty expressWarranty, Warranty effectiveExpressWarranty, Part sensor, Warranty extendedWarranty) {
+    private Article(Warranty moneyBackGuarantee, Warranty expressWarranty, Warranty effectiveExpressWarranty, Optional<Part> sensor, Warranty extendedWarranty) {
         this.moneyBackGuarantee = moneyBackGuarantee;
         this.expressWarranty = expressWarranty;
         this.effectiveExpressWarranty = effectiveExpressWarranty;
@@ -26,7 +27,7 @@ public class Article {
         this.moneyBackGuarantee = moneyBackGuarantee;
         this.expressWarranty = expressWarranty;
         this.effectiveExpressWarranty = Warranty.VOID;
-        this.sensor = null;
+        this.sensor = Optional.empty();
         this.extendedWarranty = Warranty.VOID;
     }
 
@@ -47,15 +48,17 @@ public class Article {
     }
 
     public Article install(Part sensor, Warranty extendedWarranty) {
-        return new Article(moneyBackGuarantee, expressWarranty, effectiveExpressWarranty, sensor, extendedWarranty);
+        return new Article(moneyBackGuarantee, expressWarranty, effectiveExpressWarranty, Optional.of(sensor), extendedWarranty);
     }
 
     public Article sensorNotOperational(LocalDate detectedOn) {
-        return this.install(sensor.defective(detectedOn), extendedWarranty);
+        return this.sensor
+                .map(part -> part.defective(detectedOn))
+                .map(defective -> this.install(defective,this.extendedWarranty))
+                .orElse(this);
     }
 
     public Warranty getExtendedWarranty() {
-        return sensor == null ? Warranty.VOID
-                : sensor.apply(this.extendedWarranty);
+        return this.sensor.map(part -> part.apply(this.extendedWarranty)).orElse(Warranty.VOID);
     }
 }
