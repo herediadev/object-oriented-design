@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 public class Money implements Comparable<Money> {
 
-    private BigDecimal amount;
-    private Currency currency;
+    private final BigDecimal amount;
+    private final Currency currency;
 
     public Money(BigDecimal amount, Currency currency) {
         this.amount = amount;
