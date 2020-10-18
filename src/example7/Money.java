@@ -4,30 +4,41 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class Money implements Comparable<Money> {
-    public static Money ZERO = new Money(BigDecimal.ZERO);
-    private final BigDecimal value;
+    public static Money ZERO = new Money(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
+    private final BigDecimal amount;
 
-    public Money(BigDecimal value) {
-        this.value = value;
+    public Money(BigDecimal amount) {
+        this.amount = amount;
     }
 
     public Money scale(long multiply, long divide) {
-        return new Money(
-                this.value
-                        .multiply(new BigDecimal(multiply))
-                        .divide(new BigDecimal(divide), RoundingMode.CEILING));
+        return this.scale(new BigDecimal(multiply), new BigDecimal(divide));
     }
 
     public Money scale(double factor) {
-        return new Money(this.value.multiply(new BigDecimal(factor)));
+        BigDecimal newAmount = this.getAmount().multiply(new BigDecimal(factor));
+        return new Money(newAmount);
     }
 
     public Money add(Money other) {
-        return new Money(this.value.add(other.value));
+        return new Money(this.getAmount().add(other.getAmount()));
     }
 
     @Override
     public int compareTo(Money other) {
-        return this.value.compareTo(other.value);
+        return this.getAmount().compareTo(other.getAmount());
+    }
+
+    private BigDecimal getAmount() {
+        return amount;
+    }
+
+    private Money scale(BigDecimal multiply, BigDecimal divide) {
+        return new Money(this.getAmount().multiply(multiply).divide(divide, 2, RoundingMode.HALF_UP));
+    }
+
+    @Override
+    public String toString() {
+        return "$" + getAmount();
     }
 }
