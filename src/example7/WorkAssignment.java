@@ -2,12 +2,12 @@ package example7;
 
 import java.time.Duration;
 
-public class WorkAssigment {
+public class WorkAssignment {
 
     private final Painter painter;
     private final double sqMeters;
 
-    public WorkAssigment(Painter painter, double sqMeters) {
+    public WorkAssignment(Painter painter, double sqMeters) {
         this.painter = painter;
         this.sqMeters = sqMeters;
     }

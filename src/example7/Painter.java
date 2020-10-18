@@ -17,8 +17,8 @@ public interface Painter {
         return new Velocity(sqMeters, this.estimateTimeToPaint(sqMeters));
     }
 
-    default WorkAssigment assign(double sqMeters) {
-        return new WorkAssigment(this, sqMeters);
+    default WorkAssignment assign(double sqMeters) {
+        return new WorkAssignment(this, sqMeters);
     }
 
     static PainterStream stream(List<Painter> painters) {

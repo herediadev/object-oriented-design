@@ -15,15 +15,7 @@ public class CompositePainter implements Painter {
         this.painters = painters;
     }
 
-    @Override
-    public Duration estimateTimeToPaint(double sqMeters) {
-        return this.schedule(sqMeters)
-                .map(WorkAssigment::estimateTimeToPaint)
-                .max(Duration::compareTo)
-                .get();
-    }
-
-    public static Optional<Painter> of(List<Painter> painters) {
+    public static Optional<CompositePainter> of(List<Painter> painters) {
         return painters.isEmpty()
                 ? Optional.empty()
                 : Optional.of(new CompositePainter(painters));
@@ -36,22 +28,30 @@ public class CompositePainter implements Painter {
                         .stream(this.painters)
                         .available()
                         .collect(Collectors.toList())
-        );
+        ).map(Function.identity());
+    }
+
+    @Override
+    public Duration estimateTimeToPaint(double sqMeters) {
+        return this.schedule(sqMeters)
+                .map(WorkAssignment::estimateTimeToPaint)
+                .max(Duration::compareTo)
+                .get();
     }
 
     @Override
     public Money estimateCompensation(double sqMeters) {
         return this.schedule(sqMeters)
-                .map(WorkAssigment::estimateCompensation)
+                .map(WorkAssignment::estimateCompensation)
                 .reduce(Money::add)
                 .orElse(Money.ZERO);
     }
 
-    private Stream<WorkAssigment> schedule(double sqMeters) {
-        return this.schedule(sqMeters, this.estimateVelocity(sqMeters));
+    private Stream<WorkAssignment> schedule(double sqMeters) {
+        return this.schedule(sqMeters, this.estimateTotalVelocity(sqMeters));
     }
 
-    private Stream<WorkAssigment> schedule(double sqMeters, Velocity totalVelocity) {
+    private Stream<WorkAssignment> schedule(double sqMeters, Velocity totalVelocity) {
         return Painter.stream(this.painters)
                 .map(painter -> painter.assign(sqMeters * painter.estimateVelocity(sqMeters).divideBy(totalVelocity)));
     }
