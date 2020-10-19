@@ -3,7 +3,7 @@ package example7;
 import java.util.List;
 import java.util.stream.Stream;
 
-class ConstantVelocityScheduler implements PainterScheduler {
+class ConstantVelocityScheduler implements PaintingScheduler {
 
     @Override
     public Stream<WorkAssignment> schedule(List<Painter> painters, double sqMeters) {

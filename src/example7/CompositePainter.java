@@ -10,14 +10,14 @@ import java.util.stream.Stream;
 public class CompositePainter implements Painter {
 
     private final List<Painter> painters;
-    private final PainterScheduler scheduler;
+    private final PaintingScheduler scheduler;
 
-    private CompositePainter(List<Painter> painters, PainterScheduler scheduler) {
+    private CompositePainter(List<Painter> painters, PaintingScheduler scheduler) {
         this.painters = painters;
         this.scheduler = scheduler;
     }
 
-    public static Optional<CompositePainter> of(List<Painter> painters, PainterScheduler scheduler) {
+    public static Optional<CompositePainter> of(List<Painter> painters, PaintingScheduler scheduler) {
         return painters.isEmpty()
                 ? Optional.empty()
                 : Optional.of(new CompositePainter(painters, scheduler));
@@ -54,6 +54,13 @@ public class CompositePainter implements Painter {
         return this
                 .getPaintersName()
                 .collect(Collectors.joining(", ", "{ ", " }"));
+    }
+
+    @Override
+    public double estimateSqMeters(Duration time) {
+        return Painter.stream(painters)
+                .mapToDouble(painter -> painter.estimateSqMeters(time))
+                .sum();
     }
 
     private Stream<String> getPaintersName() {

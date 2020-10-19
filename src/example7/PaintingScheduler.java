@@ -3,6 +3,6 @@ package example7;
 import java.util.List;
 import java.util.stream.Stream;
 
-public interface PainterScheduler {
+public interface PaintingScheduler {
     Stream<WorkAssignment> schedule(List<Painter> painters, double sqMeters);
 }

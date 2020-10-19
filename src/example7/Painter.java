@@ -24,4 +24,6 @@ public interface Painter {
     static PainterStream stream(List<Painter> painters) {
         return new PainterStream(painters.stream());
     }
+
+    double estimateSqMeters(Duration time);
 }
