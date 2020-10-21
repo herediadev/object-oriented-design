@@ -1,7 +1,10 @@
 package example7;
 
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PainterStream implements ForwardingStream<Painter> {
@@ -30,5 +33,17 @@ public class PainterStream implements ForwardingStream<Painter> {
         return this
                 .getStream()
                 .min(Comparator.comparing(painter -> painter.estimateCompensation(sqMeters)));
+    }
+
+    public double estimateSqMeters(Duration time) {
+        return this.getStream()
+                .mapToDouble(painter -> painter.estimateSqMeters(time))
+                .sum();
+    }
+
+    public Optional<Painter> workTogether(PaintingScheduler scheduler) {
+        return CompositePainter.of(
+                this.getStream().collect(Collectors.toList()), scheduler)
+                .map(Function.identity());
     }
 }

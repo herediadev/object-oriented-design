@@ -1,6 +1,7 @@
 package example7;
 
 import java.time.Duration;
+import java.util.stream.Stream;
 
 public class WorkAssignment {
 
@@ -10,6 +11,10 @@ public class WorkAssignment {
     public WorkAssignment(Painter painter, double sqMeters) {
         this.painter = painter;
         this.sqMeters = sqMeters;
+    }
+
+    public static WorkStream stream(Stream<WorkAssignment> stream) {
+        return new WorkStream(stream);
     }
 
     public Money estimateCompensation() {

@@ -9,44 +9,41 @@ import java.util.stream.Stream;
 
 public class CompositePainter implements Painter {
 
-    private final List<Painter> painters;
+    private final List<Painter> subordinatePainters ;
     private final PaintingScheduler scheduler;
 
-    private CompositePainter(List<Painter> painters, PaintingScheduler scheduler) {
-        this.painters = painters;
+    private CompositePainter(List<Painter> subordinatePainters, PaintingScheduler scheduler) {
+        this.subordinatePainters = subordinatePainters;
         this.scheduler = scheduler;
     }
 
-    public static Optional<CompositePainter> of(List<Painter> painters, PaintingScheduler scheduler) {
-        return painters.isEmpty()
+    public static Optional<CompositePainter> of(List<Painter> subordinatePainters, PaintingScheduler scheduler) {
+        return subordinatePainters.isEmpty()
                 ? Optional.empty()
-                : Optional.of(new CompositePainter(painters, scheduler));
+                : Optional.of(new CompositePainter(subordinatePainters, scheduler));
     }
 
     @Override
     public Optional<Painter> available() {
-        return CompositePainter.of(
-                Painter
-                        .stream(this.painters)
-                        .available()
-                        .collect(Collectors.toList()), new ConstantVelocityScheduler()
-        ).map(Function.identity());
+        return this.painters().available().workTogether(this.scheduler);
     }
 
     @Override
     public Duration estimateTimeToPaint(double sqMeters) {
-        return scheduler.schedule(painters, sqMeters)
-                .map(WorkAssignment::estimateTimeToPaint)
-                .max(Duration::compareTo)
-                .get();
+        return schedule(sqMeters)
+                .timesToPaint()
+                .maxOfMany();
     }
 
     @Override
     public Money estimateCompensation(double sqMeters) {
-        return scheduler.schedule(painters, sqMeters)
-                .map(WorkAssignment::estimateCompensation)
-                .reduce(Money::add)
-                .orElse(Money.ZERO);
+        return schedule(sqMeters)
+                .compensations()
+                .sum();
+    }
+
+    private WorkStream schedule(double sqMeters) {
+        return scheduler.schedule(subordinatePainters, sqMeters);
     }
 
     @Override
@@ -58,12 +55,14 @@ public class CompositePainter implements Painter {
 
     @Override
     public double estimateSqMeters(Duration time) {
-        return Painter.stream(painters)
-                .mapToDouble(painter -> painter.estimateSqMeters(time))
-                .sum();
+        return painters().estimateSqMeters(time);
     }
 
     private Stream<String> getPaintersName() {
-        return Painter.stream(this.painters).map(Painter::getName);
+        return painters().map(Painter::getName);
+    }
+
+    private PainterStream painters() {
+        return Painter.stream(subordinatePainters);
     }
 }

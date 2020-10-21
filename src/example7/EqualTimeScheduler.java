@@ -7,10 +7,10 @@ import java.util.stream.Stream;
 
 public class EqualTimeScheduler implements PaintingScheduler {
     @Override
-    public Stream<WorkAssignment> schedule(List<Painter> painters, double sqMeters) {
+    public WorkStream schedule(List<Painter> painters, double sqMeters) {
         return this.getUpperDuration(painters, sqMeters)
                 .map(upper -> scheduleNonEmpty(painters, sqMeters, upper))
-                .orElse(Stream.empty());
+                .orElse(WorkAssignment.stream(Stream.empty()));
     }
 
     private Optional<Duration> getUpperDuration(List<Painter> painters, double sqMeters) {
@@ -19,13 +19,13 @@ public class EqualTimeScheduler implements PaintingScheduler {
                 .min(Duration::compareTo);
     }
 
-    private Stream<WorkAssignment> scheduleNonEmpty(List<Painter> painters, double sqMeters, Duration upper) {
+    private WorkStream scheduleNonEmpty(List<Painter> painters, double sqMeters, Duration upper) {
         return this.scheduleNonEmpty(painters, this.getTotalTime(painters, sqMeters, upper));
     }
 
-    private Stream<WorkAssignment> scheduleNonEmpty(List<Painter> painters, Duration totalTime) {
-        return Painter.stream(painters)
-                .map(painter -> painter.assign(painter.estimateSqMeters(totalTime)));
+    private WorkStream scheduleNonEmpty(List<Painter> painters, Duration totalTime) {
+        return WorkAssignment.stream(Painter.stream(painters)
+                .map(painter -> painter.assign(painter.estimateSqMeters(totalTime))));
     }
 
     private Duration getTotalTime(List<Painter> painters, double sqMeters, Duration upper) {
