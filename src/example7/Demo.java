@@ -98,8 +98,8 @@ public class Demo {
 
         System.out.println();
         System.out.println("Demo #2 - Letting a composite painter work");
-        Optional<CompositePainter> group1 = CompositePainter.of(painters1, new ConstantVelocityScheduler());
-        group1.ifPresent(group -> this.print(group, sqMeters));
+        OptionalPainter group1 = CompositePainter.of(painters1, new ConstantVelocityScheduler());
+        group1.asOptional().ifPresent(group -> this.print(group, sqMeters));
 
         List<Painter> painters2 = this.createPainters2();
         System.out.println();
@@ -108,8 +108,8 @@ public class Demo {
 
         System.out.println();
         System.out.println("Demo #4 - Composite painter with compressor and roller painters");
-        Optional<CompositePainter> group2 = CompositePainter.of(painters2, new EqualTimeScheduler());
-        group2.ifPresent(group -> this.print(group, sqMeters));
+        OptionalPainter group2 = CompositePainter.of(painters2, new EqualTimeScheduler());
+        group2.asOptional().ifPresent(group -> this.print(group, sqMeters));
 
         System.out.println();
         System.out.println("Demo #5 - Recursively composing composite painters");
@@ -119,9 +119,41 @@ public class Demo {
                 new CompressorPainter("Jim", Duration.ofMinutes(9), 14,
                         Duration.ofMinutes(22), 11, this.perHour(90)),
                 group))
-                .flatMap(painters3 -> CompositePainter.of(painters3, new EqualTimeScheduler()));
+                .flatMap(painters3 -> CompositePainter.of(painters3, new EqualTimeScheduler()).asOptional());
 
-        group3.ifPresent(group -> this.print(group,sqMeters));
+        group3.ifPresent(group -> this.print(group, sqMeters));
+
+        PaintingScheduler[] schedulers = {new EqualTimeScheduler(), SelectingScheduler.fastest(), SelectingScheduler.cheapest()};
+
+        for (PaintingScheduler scheduler : schedulers) {
+
+            OptionalAssignment assignment = painters1.get(0)
+                    .with(painters1.get(1))
+                    .with(new CompressorPainter("Jim", Duration.ofMinutes(9), 14,
+                            Duration.ofMinutes(22), 11, this.perHour(90)))
+                    .with(group2)
+                    .available()
+                    .workTogether(scheduler)
+                    .assign(sqMeters);
+
+            System.out.println(assignment);
+        }
+
+
+        System.out.println("Using SelectingScheduler");
+        OptionalAssignment assignment = CompositePainter.of(Arrays.asList(painters1.get(0)),SelectingScheduler.cheapest())
+                .available()
+                .assign(sqMeters);
+
+        System.out.println(assignment);
+
+        OptionalAssignment assignment2 = painters1.get(0)
+                .with(painters1.get(1))
+                .available()
+                .workTogether(SelectingScheduler.cheapest())
+                .assign(sqMeters);
+
+        System.out.println(assignment2);
 
     }
 

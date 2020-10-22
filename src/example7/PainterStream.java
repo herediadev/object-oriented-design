@@ -24,6 +24,7 @@ public class PainterStream implements ForwardingStream<Painter> {
         return new PainterStream(
                 this.getStream()
                         .map(Painter::available)
+                        .map(OptionalPainter::asOptional)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
         );
@@ -41,10 +42,9 @@ public class PainterStream implements ForwardingStream<Painter> {
                 .sum();
     }
 
-    public Optional<Painter> workTogether(PaintingScheduler scheduler) {
+    public OptionalPainter workTogether(PaintingScheduler scheduler) {
         return CompositePainter.of(
-                this.getStream().collect(Collectors.toList()), scheduler)
-                .map(Function.identity());
+                this.getStream().collect(Collectors.toList()), scheduler);
     }
 
     public WorkStream assign(Duration totalTime) {
@@ -54,5 +54,17 @@ public class PainterStream implements ForwardingStream<Painter> {
 
     public DurationsStream timesToPaint(double sqMeters) {
         return DurationsStream.stream(this.getStream().map(painter -> painter.estimateTimeToPaint(sqMeters)));
+    }
+
+    public PainterStream with(Painter other) {
+        return new PainterStream(Stream.concat(this.getStream(), Stream.of(other)));
+    }
+
+    public PainterStream with(Optional<Painter> other) {
+        return other.map(this::with).orElse(this);
+    }
+
+    public PainterStream with(OptionalPainter other){
+        return this.with(other.asOptional());
     }
 }

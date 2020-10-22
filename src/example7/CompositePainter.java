@@ -2,8 +2,6 @@ package example7;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,14 +15,14 @@ public class CompositePainter implements Painter {
         this.scheduler = scheduler;
     }
 
-    public static Optional<CompositePainter> of(List<Painter> subordinatePainters, PaintingScheduler scheduler) {
+    public static OptionalPainter of(List<Painter> subordinatePainters, PaintingScheduler scheduler) {
         return subordinatePainters.isEmpty()
-                ? Optional.empty()
-                : Optional.of(new CompositePainter(subordinatePainters, scheduler));
+                ? OptionalPainter.empty()
+                : OptionalPainter.of(new CompositePainter(subordinatePainters, scheduler));
     }
 
     @Override
-    public Optional<Painter> available() {
+    public OptionalPainter available() {
         return this.painters().available().workTogether(this.scheduler);
     }
 

@@ -30,8 +30,8 @@ public class CompressorPainter implements Painter {
 
 
     @Override
-    public Optional<Painter> available() {
-        return Optional.of(this);
+    public OptionalPainter available() {
+        return OptionalPainter.of(this);
     }
 
     @Override
