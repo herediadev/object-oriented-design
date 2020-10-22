@@ -1,6 +1,7 @@
 package example7;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class DurationsStream implements ForwardingStream<Duration> {
@@ -21,5 +22,9 @@ public class DurationsStream implements ForwardingStream<Duration> {
 
     public Duration maxOfMany() {
         return this.getStream().max(Duration::compareTo).get();
+    }
+
+    public Optional<Duration> min() {
+        return this.getStream().min(Duration::compareTo);
     }
 }
