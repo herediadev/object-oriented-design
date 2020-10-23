@@ -141,7 +141,7 @@ public class Demo {
 
 
         System.out.println("Using SelectingScheduler");
-        OptionalAssignment assignment = CompositePainter.of(Arrays.asList(painters1.get(0)),SelectingScheduler.cheapest())
+        OptionalAssignment assignment = CompositePainter.of(Arrays.asList(painters1.get(1)),SelectingScheduler.cheapest())
                 .available()
                 .assign(sqMeters);
 
